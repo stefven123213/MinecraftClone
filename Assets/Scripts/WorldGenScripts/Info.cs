@@ -2,10 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#region classes
 public static class VoxelData
 {
     public static readonly int chunkWidth = 5;
     public static readonly int chunkHeight = 15;
+
+    public static readonly int textureSize = 16;
+    public static float blockWidth
+    {
+        get
+        {
+            return 1f / textureSize;
+        }
+    }
 
     public static readonly Vector3[] voxelVerts = new Vector3[8]
     {
@@ -37,3 +47,14 @@ public static class VoxelData
         new Vector3Int(1, 0, 0),
     };
 }
+#endregion
+
+#region structs
+[System.Serializable]
+public struct BlockType
+{
+    public string blockName;
+    public bool isSolid;
+    public Vector2[] uvs;
+}
+#endregion
