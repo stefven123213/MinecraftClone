@@ -21,6 +21,8 @@ public class Chunk : MonoBehaviour
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         meshCollider = gameObject.AddComponent<MeshCollider>();
 
+        meshRenderer.material = World.world.material;
+
         PopulateVoxelMap();
         CreateChunk();
         CreateMesh();
@@ -47,22 +49,24 @@ public class Chunk : MonoBehaviour
             {
                 for(int y = 0; y < VoxelData.chunkHeight; y++)
                 {
-                    CreateVoxelData(new Vector3Int(x, y, z));
+                    if (World.world.blockTypes[voxelMap[x, y, z]].isSolid)
+                        CreateVoxelData(new Vector3Int(x, y, z));
                 }
             }
         }
     }
     void CreateVoxelData(Vector3Int pos)
     {
-        for (int p = 0; p < 6; p++)
+        for (byte p = 0; p < 6; p++)
         {
             if (!CheckVoxel(pos + VoxelData.faceChecks[p]))
             {
-                for (int i = 0; i < 4; i++)
+                for (byte i = 0; i < 4; i++)
                 {
                     vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, i]]);
-                    uvs.Add(new Vector2());
                 }
+
+                AddTexture(pos, p);
 
                 triangles.Add(vertexIndex);
                 triangles.Add(vertexIndex + 1);
@@ -73,6 +77,18 @@ public class Chunk : MonoBehaviour
                 vertexIndex += 4;
             }
         }
+    }
+    void AddTexture(Vector3Int pos, byte faceIndex)
+    {
+        Vector2 uv = World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].uvs[faceIndex];
+
+        float x = uv.x / (float)VoxelData.textureSize;
+        float y = uv.y / (float)VoxelData.textureSize;
+
+        uvs.Add(new Vector2(x, y));
+        uvs.Add(new Vector2(x, y + VoxelData.blockWidth));
+        uvs.Add(new Vector2(x + VoxelData.blockWidth, y));
+        uvs.Add(new Vector2(x + VoxelData.blockWidth, y + VoxelData.blockWidth));
     }
     void CreateMesh()
     {
@@ -92,6 +108,6 @@ public class Chunk : MonoBehaviour
         if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkWidth - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
             return false;
         else
-            return voxelMap[pos.x, pos.y, pos.z] == 0;
+            return World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].isSolid;
     }
 }
