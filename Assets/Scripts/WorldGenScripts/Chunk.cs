@@ -13,33 +13,65 @@ public class Chunk : MonoBehaviour
     List<int> triangles = new List<int>();
     int vertexIndex = 0;
 
+    byte[,,] voxelMap = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
+
     private void Start()
     {
         meshFilter = gameObject.AddComponent<MeshFilter>();
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         meshCollider = gameObject.AddComponent<MeshCollider>();
 
-        CreateVoxelData();
+        PopulateVoxelMap();
+        CreateChunk();
         CreateMesh();
     }
 
-    void CreateVoxelData()
+    void PopulateVoxelMap()
     {
-        for(int p = 0; p < 6; p++)
+        for (int x = 0; x < VoxelData.chunkWidth; x++)
         {
-            for(int i = 0; i < 4; i++)
+            for (int z = 0; z < VoxelData.chunkWidth; z++)
             {
-                vertices.Add(VoxelData.voxelVerts[VoxelData.voxelTris[p, i]]);
-                uvs.Add(new Vector2());
+                for (int y = 0; y < VoxelData.chunkHeight; y++)
+                {
+                    voxelMap[x, y, z] = 0;
+                }
             }
+        }
+    }
+    void CreateChunk()
+    {
+        for(int x = 0; x < VoxelData.chunkWidth; x++)
+        {
+            for(int z = 0; z < VoxelData.chunkWidth; z++)
+            {
+                for(int y = 0; y < VoxelData.chunkHeight; y++)
+                {
+                    CreateVoxelData(new Vector3Int(x, y, z));
+                }
+            }
+        }
+    }
+    void CreateVoxelData(Vector3Int pos)
+    {
+        for (int p = 0; p < 6; p++)
+        {
+            if (!CheckVoxel(pos + VoxelData.faceChecks[p]))
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, i]]);
+                    uvs.Add(new Vector2());
+                }
 
-            triangles.Add(vertexIndex);
-            triangles.Add(vertexIndex + 1);
-            triangles.Add(vertexIndex + 2);
-            triangles.Add(vertexIndex + 2);
-            triangles.Add(vertexIndex + 1);
-            triangles.Add(vertexIndex + 3);
-            vertexIndex += 4;
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex + 3);
+                vertexIndex += 4;
+            }
         }
     }
     void CreateMesh()
@@ -53,5 +85,13 @@ public class Chunk : MonoBehaviour
         mesh.RecalculateNormals();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
+    }
+
+    bool CheckVoxel(Vector3Int pos)
+    {
+        if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkWidth - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
+            return false;
+        else
+            return voxelMap[pos.x, pos.y, pos.z] == 0;
     }
 }
