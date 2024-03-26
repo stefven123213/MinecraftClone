@@ -364,6 +364,7 @@ MonoBehaviour:
     - {x: 0, y: 14}
     - {x: 0, y: 14}
     - {x: 0, y: 14}
+  renderDistance: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
