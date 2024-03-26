@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chunk : MonoBehaviour
+public class Chunk
 {
     MeshFilter meshFilter;
     MeshRenderer meshRenderer;
@@ -15,11 +15,28 @@ public class Chunk : MonoBehaviour
 
     byte[,,] voxelMap = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
 
-    private void Start()
+    public GameObject chunkObject;
+    public Vector3Int position;
+    public ChunkCoord coord;
+
+    public Chunk(ChunkCoord coord)
     {
-        meshFilter = gameObject.AddComponent<MeshFilter>();
-        meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshCollider = gameObject.AddComponent<MeshCollider>();
+        this.coord = coord;
+
+        Init();
+    } 
+
+    void Init()
+    {
+        chunkObject = new GameObject();
+        chunkObject.name = "Chunk " + coord.x + ", " + coord.z;
+        chunkObject.transform.position = position = new Vector3Int(coord.x * VoxelData.chunkWidth, 0, coord.z * VoxelData.chunkWidth);
+        chunkObject.layer = LayerMask.NameToLayer("Chunk");
+        chunkObject.transform.SetParent(World.world.transform);
+
+        meshFilter = chunkObject.AddComponent<MeshFilter>();
+        meshRenderer = chunkObject.AddComponent<MeshRenderer>();
+        meshCollider = chunkObject.AddComponent<MeshCollider>();
 
         meshRenderer.material = World.world.material;
 
