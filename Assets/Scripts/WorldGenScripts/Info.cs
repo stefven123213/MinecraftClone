@@ -5,8 +5,8 @@ using UnityEngine;
 #region classes
 public static class VoxelData
 {
-    public static readonly int chunkWidth = 5;
-    public static readonly int chunkHeight = 15;
+    public static readonly int chunkWidth = 16;
+    public static readonly int chunkHeight = 256;
 
     public static readonly int textureSize = 16;
     public static float blockWidth

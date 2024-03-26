@@ -43,4 +43,32 @@ public class World : MonoBehaviour
     {
         chunks.Add(coord, new Chunk(coord));
     }
+
+    public byte GetVoxel(Vector3Int pos)
+    {
+        if (!isVoxelInWorld(pos))
+            return 0;
+
+        if (pos.y == 0)
+            return 1;
+
+        int terrainHeight = 15;
+
+        if (pos.y < terrainHeight - 3)
+            return 2;
+        else if (pos.y < terrainHeight)
+            return 3;
+        else if (pos.y == terrainHeight)
+            return 4;
+        else
+            return 0;
+    }
+
+    public bool isVoxelInWorld(Vector3Int pos)
+    {
+        if (pos.y < 0 || pos.y > VoxelData.chunkHeight - 1)
+            return false;
+        else
+            return true;
+    }
 }

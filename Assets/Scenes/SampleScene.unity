@@ -355,7 +355,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 18ee1d82772598b49bc311e6b30e8fd6, type: 2}
   blockTypes:
-  - blockName: test
+  - blockName: Air
+    isSolid: 0
+    uvs:
+    - {x: 0, y: 14}
+    - {x: 0, y: 14}
+    - {x: 0, y: 14}
+    - {x: 0, y: 14}
+    - {x: 0, y: 14}
+    - {x: 0, y: 14}
+  - blockName: Bedrock
+    isSolid: 1
+    uvs:
+    - {x: 1, y: 14}
+    - {x: 1, y: 14}
+    - {x: 1, y: 14}
+    - {x: 1, y: 14}
+    - {x: 1, y: 14}
+    - {x: 1, y: 14}
+  - blockName: Stone
     isSolid: 1
     uvs:
     - {x: 0, y: 14}
@@ -364,6 +382,24 @@ MonoBehaviour:
     - {x: 0, y: 14}
     - {x: 0, y: 14}
     - {x: 0, y: 14}
+  - blockName: Dirt
+    isSolid: 1
+    uvs:
+    - {x: 1, y: 15}
+    - {x: 1, y: 15}
+    - {x: 1, y: 15}
+    - {x: 1, y: 15}
+    - {x: 1, y: 15}
+    - {x: 1, y: 15}
+  - blockName: Grass
+    isSolid: 1
+    uvs:
+    - {x: 0, y: 15}
+    - {x: 1, y: 15}
+    - {x: 2, y: 15}
+    - {x: 2, y: 15}
+    - {x: 2, y: 15}
+    - {x: 2, y: 15}
   renderDistance: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
