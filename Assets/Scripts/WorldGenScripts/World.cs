@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    #region singleton
     public static World world;
     private void Awake()
     {
@@ -12,7 +13,13 @@ public class World : MonoBehaviour
         else if (world != this)
             Destroy(this);
     }
+    #endregion
 
     public Material material;
     public BlockType[] blockTypes;
+
+    private void Start()
+    {
+        Chunk newChunk = new Chunk(new ChunkCoord());
+    }
 }

@@ -57,4 +57,19 @@ public struct BlockType
     public bool isSolid;
     public Vector2[] uvs;
 }
+public struct ChunkCoord
+{
+    public int x, z;
+
+    public ChunkCoord(int x, int z)
+    {
+        this.x = x;
+        this.z = z;
+    }
+    public ChunkCoord(Vector3 pos)
+    {
+        x = Mathf.FloorToInt(pos.x / VoxelData.chunkWidth);
+        z = Mathf.FloatToHalf(pos.z / VoxelData.chunkWidth);
+    }
+}
 #endregion
