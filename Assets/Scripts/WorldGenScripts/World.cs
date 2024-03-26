@@ -19,6 +19,10 @@ public class World : MonoBehaviour
     public Material material;
     public BlockType[] blockTypes;
 
+    public GameObject player;
+    ChunkCoord playerChunkCoord, playerLastChunkCoord;
+    public int chunkBuffer;
+
     public int renderDistance;
 
     public Dictionary<ChunkCoord, Chunk> chunks = new Dictionary<ChunkCoord, Chunk>();
@@ -26,8 +30,40 @@ public class World : MonoBehaviour
     private void Start()
     {
         GenerateWorld();
+        playerLastChunkCoord = playerChunkCoord = new ChunkCoord(player.transform.position);
+    }
+    private void FixedUpdate()
+    {
+        playerChunkCoord = new ChunkCoord(player.transform.position);
+
+        CheckChunks();
     }
 
+    void CheckChunks()
+    {
+        if (playerChunkCoord != playerLastChunkCoord)
+        {
+            for (int x = playerChunkCoord.x - renderDistance - chunkBuffer; x < playerChunkCoord.x + renderDistance + chunkBuffer; x++)
+            {
+                for (int z = playerChunkCoord.z - renderDistance - chunkBuffer; z < playerChunkCoord.z + renderDistance + chunkBuffer; z++)
+                {
+                    ChunkCoord coord = new ChunkCoord(x, z);
+
+                    if (isChunkInRenderDistance(coord))
+                    {
+                        if (!chunks.ContainsKey(coord))
+                            CreateChunk(coord);
+
+                        if (!chunks[coord].isActive)
+                            chunks[coord].isActive = true;
+                    }
+                    else if (chunks.ContainsKey(coord) && chunks[coord].isActive)
+                        chunks[coord].isActive = false;
+                }
+            }
+            playerLastChunkCoord = playerChunkCoord;
+        }
+    }
     void GenerateWorld()
     {
         for(int x = -renderDistance; x < renderDistance; x++)
@@ -67,6 +103,16 @@ public class World : MonoBehaviour
     public bool isVoxelInWorld(Vector3Int pos)
     {
         if (pos.y < 0 || pos.y > VoxelData.chunkHeight - 1)
+            return false;
+        else
+            return true;
+    }
+    public bool isChunkInRenderDistance(ChunkCoord coord)
+    {
+        if (coord.x < playerChunkCoord.x - renderDistance ||
+           coord.x > playerChunkCoord.x + renderDistance ||
+           coord.z < playerChunkCoord.z - renderDistance ||
+           coord.z > playerChunkCoord.z + renderDistance)
             return false;
         else
             return true;

@@ -127,4 +127,15 @@ public class Chunk
         else
             return World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].isSolid;
     }
+    public bool isActive
+    {
+        get
+        {
+            return chunkObject.activeSelf;
+        }
+        set
+        {
+            chunkObject.SetActive(value);
+        }
+    }
 }

@@ -69,7 +69,31 @@ public struct ChunkCoord
     public ChunkCoord(Vector3 pos)
     {
         x = Mathf.FloorToInt(pos.x / VoxelData.chunkWidth);
-        z = Mathf.FloatToHalf(pos.z / VoxelData.chunkWidth);
+        z = Mathf.FloorToInt(pos.z / VoxelData.chunkWidth);
+    }
+
+    public static bool operator ==(ChunkCoord a, ChunkCoord b)
+    {
+        return a.x == b.x && a.z == b.z;
+    }
+    public static bool operator !=(ChunkCoord a, ChunkCoord b)
+    {
+        return !(a == b);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return base.ToString();
     }
 }
 #endregion

@@ -335,7 +335,7 @@ Transform:
   m_GameObject: {fileID: 1020432570}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.07706092, y: 1.7186896, z: -0.08854595}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -400,6 +400,8 @@ MonoBehaviour:
     - {x: 2, y: 15}
     - {x: 2, y: 15}
     - {x: 2, y: 15}
+  player: {fileID: 963194225}
+  chunkBuffer: 5
   renderDistance: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
