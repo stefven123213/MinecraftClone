@@ -24,14 +24,12 @@ public class World : MonoBehaviour
     public int chunkBuffer;
 
     public int renderDistance;
-    public int minHeight, maxHeight;
 
     public Dictionary<ChunkCoord, Chunk> chunks = new Dictionary<ChunkCoord, Chunk>();
     Queue<Chunk> chunksToCreate = new Queue<Chunk>();
 
     private void Start()
     {
-        player.transform.position = new Vector3(0f, maxHeight, 0f);
         playerLastChunkCoord = playerChunkCoord = new ChunkCoord(player.transform.position);
 
         GenerateWorld();
@@ -75,7 +73,7 @@ public class World : MonoBehaviour
         {
             for(int z = -renderDistance; z < renderDistance; z++)
             {
-                CreateChunk(new ChunkCoord(x, z), true, true);
+                CreateChunk(new ChunkCoord(x, z), true, false);
             }
         }
     }
@@ -105,24 +103,7 @@ public class World : MonoBehaviour
         if (pos.y == 0)
             return 1;
 
-        int terrainHeight = GetTerrainHeight(pos);
-
-        if (pos.y < terrainHeight - 3)
-            return 2;
-        else if (pos.y < terrainHeight)
-            return 3;
-        else if (pos.y == terrainHeight)
-            return 4;
-        else
-            return 0;
-    }
-    public byte PopulateVoxel(Vector3Int pos, int terrainHeight)
-    {
-        if (!isVoxelInWorld(pos))
-            return 0;
-
-        if (pos.y == 0)
-            return 1;
+        int terrainHeight = 15;
 
         if (pos.y < terrainHeight - 3)
             return 2;
@@ -150,11 +131,6 @@ public class World : MonoBehaviour
             return false;
         else
             return true;
-    }
-
-    public int GetTerrainHeight(Vector3Int pos)
-    {
-        return minHeight + Mathf.FloorToInt((maxHeight - minHeight) * Noise.Get2DPerlin(pos.x, pos.z, 0.25f, 123));
     }
 
     IEnumerator InitChunks(int populateBuffer)

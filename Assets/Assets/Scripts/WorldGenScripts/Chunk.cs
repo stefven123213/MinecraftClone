@@ -48,11 +48,9 @@ public class Chunk
         {
             for (int z = 0; z < VoxelData.chunkWidth; z++)
             {
-                int terrainHeight = World.world.GetTerrainHeight(new Vector3Int(x, 0, z) + position);
-
                 for (int y = 0; y < VoxelData.chunkHeight; y++)
                 {
-                    voxelMap[x, y, z] = World.world.PopulateVoxel(new Vector3Int(x, y, z) + position, terrainHeight);
+                    voxelMap[x, y, z] = World.world.GetVoxel(new Vector3Int(x, y, z) + position);
                 }
             }
         }
@@ -123,7 +121,7 @@ public class Chunk
 
     bool CheckVoxel(Vector3Int pos)
     {
-        if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkHeight - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
+        if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkWidth - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
             return World.world.blockTypes[World.world.GetVoxel(pos + position)].isSolid;
         else
             return World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].isSolid;
