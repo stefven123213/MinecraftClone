@@ -47,6 +47,13 @@ public static class VoxelData
         new Vector3Int(1, 0, 0),
     };
 }
+public static class Noise
+{
+    public static float Get2DPerlin(int x, int z, float scale, float offset)
+    {
+        return Mathf.PerlinNoise(((x + 0.1f) / VoxelData.chunkWidth) * scale + offset, ((z + 0.1f) / VoxelData.chunkWidth) * scale + offset);
+    }
+}
 #endregion
 
 #region structs

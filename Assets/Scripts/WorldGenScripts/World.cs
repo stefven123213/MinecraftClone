@@ -24,13 +24,18 @@ public class World : MonoBehaviour
     public int chunkBuffer;
 
     public int renderDistance;
+    public int minHeight, maxHeight;
 
     public Dictionary<ChunkCoord, Chunk> chunks = new Dictionary<ChunkCoord, Chunk>();
+    Queue<Chunk> chunksToCreate = new Queue<Chunk>();
 
     private void Start()
     {
-        GenerateWorld();
+        player.transform.position = new Vector3(0f, maxHeight, 0f);
         playerLastChunkCoord = playerChunkCoord = new ChunkCoord(player.transform.position);
+
+        GenerateWorld();
+        StartCoroutine(InitChunks(2));
     }
     private void FixedUpdate()
     {
@@ -52,7 +57,7 @@ public class World : MonoBehaviour
                     if (isChunkInRenderDistance(coord))
                     {
                         if (!chunks.ContainsKey(coord))
-                            CreateChunk(coord);
+                            CreateChunk(coord, false, false);
 
                         if (!chunks[coord].isActive)
                             chunks[coord].isActive = true;
@@ -70,14 +75,26 @@ public class World : MonoBehaviour
         {
             for(int z = -renderDistance; z < renderDistance; z++)
             {
-                CreateChunk(new ChunkCoord(x, z));
+                CreateChunk(new ChunkCoord(x, z), true, true);
             }
         }
     }
 
-    void CreateChunk(ChunkCoord coord)
+    void CreateChunk(ChunkCoord coord, bool init, bool create)
     {
         chunks.Add(coord, new Chunk(coord));
+
+        if(init)
+        {
+            chunks[coord].PopulateVoxelMap();
+
+            if(create)
+            {
+                chunks[coord].CreateChunk();
+                return;
+            }
+        }
+        chunksToCreate.Enqueue(chunks[coord]);
     }
 
     public byte GetVoxel(Vector3Int pos)
@@ -88,7 +105,24 @@ public class World : MonoBehaviour
         if (pos.y == 0)
             return 1;
 
-        int terrainHeight = 15;
+        int terrainHeight = GetTerrainHeight(pos);
+
+        if (pos.y < terrainHeight - 3)
+            return 2;
+        else if (pos.y < terrainHeight)
+            return 3;
+        else if (pos.y == terrainHeight)
+            return 4;
+        else
+            return 0;
+    }
+    public byte PopulateVoxel(Vector3Int pos, int terrainHeight)
+    {
+        if (!isVoxelInWorld(pos))
+            return 0;
+
+        if (pos.y == 0)
+            return 1;
 
         if (pos.y < terrainHeight - 3)
             return 2;
@@ -116,5 +150,38 @@ public class World : MonoBehaviour
             return false;
         else
             return true;
+    }
+
+    public int GetTerrainHeight(Vector3Int pos)
+    {
+        return minHeight + Mathf.FloorToInt((maxHeight - minHeight) * Noise.Get2DPerlin(pos.x, pos.z, 0.25f, 123));
+    }
+
+    IEnumerator InitChunks(int populateBuffer)
+    {
+        int i = 0;
+        while (true)
+        {
+            if (chunksToCreate.Count > 0)
+            {
+                i++;
+
+                if (i > populateBuffer)
+                {
+                    i = 0;
+                    yield return null;
+                }
+
+                Chunk c = chunksToCreate.Dequeue();
+
+                if (!c.isVoxelMapPopulated)
+                {
+                    c.PopulateVoxelMap();
+                }
+                c.CreateChunk();
+            }
+            else
+                yield return null;
+        }
     }
 }

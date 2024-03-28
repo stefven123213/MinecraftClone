@@ -14,6 +14,7 @@ public class Chunk
     int vertexIndex = 0;
 
     byte[,,] voxelMap = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
+    public bool isVoxelMapPopulated { get; private set; } = false;
 
     public GameObject chunkObject;
     public Vector3Int position;
@@ -39,26 +40,25 @@ public class Chunk
         meshCollider = chunkObject.AddComponent<MeshCollider>();
 
         meshRenderer.material = World.world.material;
-
-        PopulateVoxelMap();
-        CreateChunk();
-        CreateMesh();
     }
 
-    void PopulateVoxelMap()
+    public void PopulateVoxelMap()
     {
         for (int x = 0; x < VoxelData.chunkWidth; x++)
         {
             for (int z = 0; z < VoxelData.chunkWidth; z++)
             {
+                int terrainHeight = World.world.GetTerrainHeight(new Vector3Int(x, 0, z) + position);
+
                 for (int y = 0; y < VoxelData.chunkHeight; y++)
                 {
-                    voxelMap[x, y, z] = World.world.GetVoxel(new Vector3Int(x, y, z) + position);
+                    voxelMap[x, y, z] = World.world.PopulateVoxel(new Vector3Int(x, y, z) + position, terrainHeight);
                 }
             }
         }
+        isVoxelMapPopulated = true;
     }
-    void CreateChunk()
+    public void CreateChunk()
     {
         for(int x = 0; x < VoxelData.chunkWidth; x++)
         {
@@ -71,6 +71,7 @@ public class Chunk
                 }
             }
         }
+        CreateMesh();
     }
     void CreateVoxelData(Vector3Int pos)
     {
@@ -122,7 +123,7 @@ public class Chunk
 
     bool CheckVoxel(Vector3Int pos)
     {
-        if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkWidth - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
+        if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkHeight - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
             return World.world.blockTypes[World.world.GetVoxel(pos + position)].isSolid;
         else
             return World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].isSolid;
