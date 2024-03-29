@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     void MovePlayer()
     {
         Vector3 dir = (transform.forward * v + transform.right * h).normalized * speed;
-        rb.velocity = new Vector3(dir.x, rb.velocity.y, dir.z);
+        rb.velocity = new Vector3(Mathf.Lerp(rb.velocity.x, dir.x, Time.deltaTime * 5f), rb.velocity.y, Mathf.Lerp(rb.velocity.z, dir.z, Time.deltaTime * 5f));
     }
     void PlayerCam()
     {
