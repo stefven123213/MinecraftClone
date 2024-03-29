@@ -8,11 +8,11 @@ public class PlayerController : MonoBehaviour
     Rigidbody rb;
     public GameObject playerCam;
 
-    public float walkSpeed;
+    public float walkSpeed, sprintSpeed, sneakSpeed;
     public float rotationSpeed;
     public float jumpHeight;
-    float h, v, mouseX, mouseY, rotY;
-    bool jumping, isGrounded;
+    float h, v, speed, mouseX, mouseY, rotY;
+    bool sprinting, sneaking, jumping, isGrounded;
 
     private void Start()
     {
@@ -29,8 +29,19 @@ public class PlayerController : MonoBehaviour
 
     void GetInputs()
     {
-        h = Input.GetAxis("Horizontal");
-        v = Input.GetAxis("Vertical");
+        sprinting = Input.GetKey(KeyCode.LeftControl);
+        sneaking = Input.GetKey(KeyCode.LeftShift);
+
+        if (sprinting && sneaking || !sprinting && !sneaking)
+            speed = walkSpeed;
+        else if (sprinting)
+            speed = sprintSpeed;
+        else
+            speed = sneakSpeed;
+
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+        v = Input.GetAxisRaw("Vertical");
 
         mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
         mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
@@ -42,7 +53,7 @@ public class PlayerController : MonoBehaviour
     }
     void MovePlayer()
     {
-        Vector3 dir = (transform.forward * v + transform.right * h) * walkSpeed;
+        Vector3 dir = (transform.forward * v + transform.right * h).normalized * speed;
         rb.velocity = new Vector3(dir.x, rb.velocity.y, dir.z);
     }
     void PlayerCam()
