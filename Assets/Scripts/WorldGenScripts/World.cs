@@ -17,6 +17,7 @@ public class World : MonoBehaviour
     #endregion
 
     public Material material;
+    public PhysicMaterial mat;
     public BlockType[] blockTypes;
 
     public GameObject player;

@@ -40,6 +40,7 @@ public class Chunk
         meshCollider = chunkObject.AddComponent<MeshCollider>();
 
         meshRenderer.material = World.world.material;
+        meshCollider.material = World.world.mat;
     }
 
     public void PopulateVoxelMap()
