@@ -46,6 +46,10 @@ public static class VoxelData
         new Vector3Int(-1, 0, 0),
         new Vector3Int(1, 0, 0),
     };
+    public static Vector3Int FloorToInt(Vector3 pos)
+    {
+        return new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+    }
 }
 public static class Noise
 {

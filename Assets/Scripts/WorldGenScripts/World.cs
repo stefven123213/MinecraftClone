@@ -45,6 +45,30 @@ public class World : MonoBehaviour
         CheckChunks();
     }
 
+    public void EditVoxel(Vector3Int _pos, byte index)
+    {
+        if (!isVoxelInWorld(_pos))
+            return;
+        ChunkCoord coord = new ChunkCoord(_pos);
+
+        if (!chunks.ContainsKey(coord))
+            return;
+        if (!chunks[coord].isVoxelMapPopulated)
+            return;
+
+        Vector3Int pos = _pos - chunks[coord].position;
+        chunks[coord].EditVoxel(pos, index);
+
+        chunks[coord].CreateChunk();
+        for(int i = 2; i < 6; i++)
+        {
+            ChunkCoord _coord = new ChunkCoord(_pos + VoxelData.faceChecks[i]);
+
+            if (coord != _coord && chunks.ContainsKey(_coord) && chunks[_coord].isVoxelMapPopulated)
+                chunks[_coord].CreateChunk();
+        }
+    }
+
     void CheckChunks()
     {
         if (playerChunkCoord != playerLastChunkCoord)
@@ -80,7 +104,6 @@ public class World : MonoBehaviour
             }
         }
     }
-
     void CreateChunk(ChunkCoord coord, bool init, bool create)
     {
         chunks.Add(coord, new Chunk(coord));
@@ -134,6 +157,21 @@ public class World : MonoBehaviour
         else
             return 0;
     }
+    public byte CheckVoxel(Vector3Int _pos)
+    {
+        if (!isVoxelInWorld(_pos))
+            return 0;
+
+        ChunkCoord coord = new ChunkCoord(_pos);
+
+        if(chunks.ContainsKey(coord) && chunks[coord].isVoxelMapPopulated)
+        {
+            Vector3Int pos = _pos - chunks[coord].position;
+            return chunks[coord].voxelMap[pos.x, pos.y, pos.z];
+        }
+
+        return GetVoxel(_pos);
+    }
 
     public bool isVoxelInWorld(Vector3Int pos)
     {
@@ -160,19 +198,10 @@ public class World : MonoBehaviour
 
     IEnumerator InitChunks(int populateBuffer)
     {
-        int i = 0;
         while (true)
         {
             if (chunksToCreate.Count > 0)
             {
-                i++;
-
-                if (i > populateBuffer)
-                {
-                    i = 0;
-                    yield return null;
-                }
-
                 Chunk c = chunksToCreate.Dequeue();
 
                 if (!c.isVoxelMapPopulated)
@@ -181,8 +210,7 @@ public class World : MonoBehaviour
                 }
                 c.CreateChunk();
             }
-            else
-                yield return null;
+            yield return null;
         }
     }
 }
