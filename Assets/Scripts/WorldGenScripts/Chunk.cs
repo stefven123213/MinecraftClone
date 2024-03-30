@@ -11,6 +11,7 @@ public class Chunk
     List<Vector3> vertices = new List<Vector3>();
     List<Vector2> uvs = new List<Vector2>();
     List<int> triangles = new List<int>();
+    List<Color> colors = new List<Color>();
     int vertexIndex = 0;
 
     byte[,,] voxelMap = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
@@ -61,11 +62,11 @@ public class Chunk
     }
     public void CreateChunk()
     {
-        for(int x = 0; x < VoxelData.chunkWidth; x++)
+        for (int x = 0; x < VoxelData.chunkWidth; x++)
         {
-            for(int z = 0; z < VoxelData.chunkWidth; z++)
+            for (int z = 0; z < VoxelData.chunkWidth; z++)
             {
-                for(int y = 0; y < VoxelData.chunkHeight; y++)
+                for (int y = 0; y < VoxelData.chunkHeight; y++)
                 {
                     if (World.world.blockTypes[voxelMap[x, y, z]].isSolid)
                         CreateVoxelData(new Vector3Int(x, y, z));
@@ -83,6 +84,7 @@ public class Chunk
                 for (byte i = 0; i < 4; i++)
                 {
                     vertices.Add(pos + VoxelData.voxelVerts[VoxelData.voxelTris[p, i]]);
+                    colors.Add(World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].colors[p]);
                 }
 
                 AddTexture(pos, p);
@@ -116,10 +118,20 @@ public class Chunk
             vertices = vertices.ToArray(),
             triangles = triangles.ToArray(),
             uv = uvs.ToArray(),
+            colors = colors.ToArray(),
         };
         mesh.RecalculateNormals();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
+        Clear();
+    }
+    void Clear()
+    {
+        vertices.Clear();
+        triangles.Clear();
+        colors.Clear();
+        uvs.Clear();
+        vertexIndex = 0;
     }
 
     bool CheckVoxel(Vector3Int pos)

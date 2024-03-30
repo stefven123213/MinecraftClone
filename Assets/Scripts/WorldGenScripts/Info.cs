@@ -63,6 +63,7 @@ public struct BlockType
     public string blockName;
     public bool isSolid;
     public Vector2[] uvs;
+    public Color[] colors;
 }
 public struct ChunkCoord
 {
