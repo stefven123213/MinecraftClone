@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class Chunk
@@ -14,12 +15,17 @@ public class Chunk
     List<Color> colors = new List<Color>();
     int vertexIndex = 0;
 
-    byte[,,] voxelMap = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
+    public byte[,,] voxelMap { get; private set; } = new byte[VoxelData.chunkWidth, VoxelData.chunkHeight, VoxelData.chunkWidth];
     public bool isVoxelMapPopulated { get; private set; } = false;
 
     public GameObject chunkObject;
     public Vector3Int position;
     public ChunkCoord coord;
+
+    Vector3[] verts;
+    int[] tris;
+    Vector2[] uv;
+    Color[] cols;
 
     public Chunk(ChunkCoord coord)
     {
@@ -42,6 +48,8 @@ public class Chunk
 
         meshRenderer.material = World.world.material;
         meshCollider.material = World.world.mat;
+
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.TwoSided;
     }
 
     public void PopulateVoxelMap()
@@ -74,6 +82,15 @@ public class Chunk
             }
         }
         CreateMesh();
+    }
+    public void UpdateChunk()
+    {
+        Thread newThread = new Thread(CreateChunk);
+        newThread.Start();
+    }
+    public void EditVoxel(Vector3Int pos, byte index)
+    {
+        voxelMap[pos.x, pos.y, pos.z] = index;
     }
     void CreateVoxelData(Vector3Int pos)
     {
@@ -113,13 +130,12 @@ public class Chunk
     }
     void CreateMesh()
     {
-        Mesh mesh = new Mesh()
-        {
-            vertices = vertices.ToArray(),
-            triangles = triangles.ToArray(),
-            uv = uvs.ToArray(),
-            colors = colors.ToArray(),
-        };
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.colors = colors.ToArray();
+
         mesh.RecalculateNormals();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
@@ -137,7 +153,7 @@ public class Chunk
     bool CheckVoxel(Vector3Int pos)
     {
         if (pos.x < 0 || pos.x > VoxelData.chunkWidth - 1 || pos.y < 0 || pos.y > VoxelData.chunkHeight - 1 || pos.z < 0 || pos.z > VoxelData.chunkWidth - 1)
-            return World.world.blockTypes[World.world.GetVoxel(pos + position)].isSolid;
+            return World.world.blockTypes[World.world.CheckVoxel(pos + position)].isSolid;
         else
             return World.world.blockTypes[voxelMap[pos.x, pos.y, pos.z]].isSolid;
     }

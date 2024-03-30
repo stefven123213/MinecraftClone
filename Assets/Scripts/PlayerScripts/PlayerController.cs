@@ -1,16 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody rb;
+    [Header("References")]
     public GameObject playerCam;
+    public GameObject selectedBlock;
+    Rigidbody rb;
 
-    public float walkSpeed, sprintSpeed, sneakSpeed;
+    [Header("Movement values")]
+    public float walkSpeed;
+    public float sprintSpeed, sneakSpeed;
+    [Space(20)]
     public float rotationSpeed;
     public float jumpHeight;
+
+    [Header("Block Editing")]
+    public float reach;
+    public byte selectedBlockIndex;
+    
     float h, v, speed, mouseX, mouseY, rotY;
     bool sprinting, sneaking, jumping, isGrounded;
 
@@ -25,6 +36,7 @@ public class PlayerController : MonoBehaviour
         MovePlayer();
         PlayerCam();
         Jump();
+        HandleSelectedBlock();
     }
 
     void GetInputs()
@@ -65,5 +77,26 @@ public class PlayerController : MonoBehaviour
     {
         if (jumping && isGrounded)
             rb.velocity = new Vector3(rb.velocity.x, jumpHeight, rb.velocity.z);
+    }
+    void HandleSelectedBlock()
+    {
+        if (Physics.Raycast(playerCam.transform.position, playerCam.transform.forward, out RaycastHit hit, reach, LayerMask.GetMask("Chunk")))
+        {
+            selectedBlock.SetActive(true);
+
+            Vector3Int breakPos = VoxelData.FloorToInt(hit.point - (hit.normal * 0.5f));
+            Vector3Int placePos = VoxelData.FloorToInt(hit.point + (hit.normal * 0.5f));
+            
+            selectedBlock.transform.position = VoxelData.FloorToInt(hit.point - (hit.normal * 0.5f));
+
+            if (Input.GetMouseButtonDown(0))
+                World.world.EditVoxel(breakPos, 0);
+            if (Input.GetMouseButtonDown(1))
+                World.world.EditVoxel(placePos, selectedBlockIndex);
+            if (Input.GetMouseButtonDown(2))
+                selectedBlockIndex = World.world.CheckVoxel(breakPos);
+        }
+        else
+            selectedBlock.SetActive(false);
     }
 }
